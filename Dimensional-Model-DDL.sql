@@ -58,7 +58,7 @@
 -- DBTITLE 1,Environment Setup
 CREATE CATALOG IF NOT EXISTS adrian_example_US_Stores;
 USE CATALOG adrian_example_US_Stores;
-CREATE SCHEMA IF NOT EXISTS Sales_DW;
+CREATE SCHEMA IF NOT EXISTS adrian_example_Sales_DW;
 USE SCHEMA Sales_DW;
 
 -- COMMAND ----------
@@ -138,7 +138,7 @@ CREATE OR REPLACE TABLE dim_date(
 -- COMMAND ----------
 
 -- DBTITLE 1,Describe Dim Store table information
-DESC TABLE EXTENDED US_Stores.Sales_DW.dim_store
+DESC TABLE EXTENDED adrian_example_US_Stores.Sales_DW.dim_store
 
 -- COMMAND ----------
 
@@ -157,16 +157,16 @@ CREATE OR REPLACE TABLE fact_sales(
 -- COMMAND ----------
 
 -- DBTITLE 1,Describe Fact Sales Table Info
-DESC TABLE EXTENDED US_Stores.Sales_DW.fact_sales
+DESC TABLE EXTENDED fact_sales
 
 -- COMMAND ----------
 
 -- DBTITLE 1,Add additional constraints  
 -- Add constraint to dim_store to make sure column store_id is between 1 and 9998
-ALTER TABLE US_Stores.Sales_DW.dim_store ADD CONSTRAINT valid_store_id CHECK (store_id > 0 and store_id < 9999);
+ALTER TABLE dim_store ADD CONSTRAINT valid_store_id CHECK (store_id > 0 and store_id < 9999);
 
 -- Add constraint to fact_sales to make sure column sales_amount has a valid value
-ALTER TABLE US_Stores.Sales_DW.fact_sales ADD CONSTRAINT valid_sales_amount CHECK (sales_amount > 0);
+ALTER TABLE fact_sales ADD CONSTRAINT valid_sales_amount CHECK (sales_amount > 0);
 
 -- COMMAND ----------
 
@@ -251,28 +251,20 @@ VALUES
 -- COMMAND ----------
 
 SELECT * 
-FROM US_Stores.Sales_DW.fact_sales
+FROM fact_sales
 
 -- COMMAND ----------
 
 -- DBTITLE 1,Optimize table using ZORDER
 -- Optimise fact_sales table by customer_id and product_id for better query and join performance
-OPTIMIZE US_Stores.Sales_DW.fact_sales 
+OPTIMIZE fact_sales 
 ZORDER BY (customer_id, product_id); 
-
--- COMMAND ----------
-
--- DBTITLE 1,Create Bloomfilter index
--- Create a bloomfilter index to enable data skipping on store_business_key 
-CREATE BLOOMFILTER INDEX
-ON TABLE US_Stores.Sales_DW.fact_sales 
-FOR COLUMNS(store_business_key)
 
 -- COMMAND ----------
 
 -- DBTITLE 1,Compute Table Statistics
 -- collect stats for all columns for better performance
-ANALYZE TABLE US_Stores.Sales_DW.fact_sales COMPUTE STATISTICS FOR ALL COLUMNS;
+ANALYZE TABLE fact_sales COMPUTE STATISTICS FOR ALL COLUMNS;
 
 -- COMMAND ----------
 
@@ -339,6 +331,7 @@ WHERE product_id = 2
 
 -- DBTITLE 1,Older version of tables still has sales amount of 79 for product ID = 2
 SELECT * FROM fact_sales VERSION as of 5
+
 WHERE product_id = 2
 
 -- COMMAND ----------
@@ -365,7 +358,7 @@ WHERE product_id = 2
 -- COMMAND ----------
 
 -- DBTITLE 1,Clean Up
-DROP CATALOG IF EXISTS US_Stores CASCADE
+DROP CATALOG IF EXISTS adrian_example_US_Stores CASCADE
 
 -- COMMAND ----------
 
