@@ -49,8 +49,13 @@ DOWNLOAD_LOCATION = f'{ROOT_PATH}/downloads'
 
 # COMMAND ----------
 
-dbutils.fs.cp('https://github.com/adrian-tompkins/dlt-workshop-2022-05-16/raw/main/data/dlt_example.parquet', f'{DOWNLOAD_LOCATION}/dlt_example.parquet')
-dbutils.fs.cp('https://github.com/adrian-tompkins/dlt-workshop-2022-05-16/raw/main/data/dlt_example_cdc.parquet', f'{DOWNLOAD_LOCATION}/dlt_example_cdc.parquet')
+os.getcwd()
+
+# COMMAND ----------
+
+import os
+dbutils.fs.cp(f'file:{os.getcwd()}/../data/dlt_example.parquet', f'{DOWNLOAD_LOCATION}/dlt_example.parquet')
+dbutils.fs.cp(f'file:{os.getcwd()}/../data/dlt_example_cdc.parquet', f'{DOWNLOAD_LOCATION}/dlt_example_cdc.parquet')
 
 # COMMAND ----------
 
