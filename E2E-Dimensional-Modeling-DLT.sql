@@ -169,7 +169,7 @@ FROM STREAM(live.silver_date);
 -- COMMAND ----------
 
 -- create the gold table
-CREATE INCREMENTAL LIVE TABLE dim_customer
+CREATE STREAMING LIVE TABLE dim_customer
 TBLPROPERTIES ("quality" = "gold")
 COMMENT "Slowly Changing Dimension Type 2 for customer dimension in the gold layer";
 
@@ -184,7 +184,7 @@ FROM stream(live.silver_customer)
 -- COMMAND ----------
 
 -- create the gold table
-CREATE INCREMENTAL LIVE TABLE dim_product
+CREATE STREAMING LIVE TABLE dim_product
 TBLPROPERTIES ("quality" = "gold")
 COMMENT "Slowly Changing Dimension Type 2 for product dimension in the gold layer";
 
@@ -199,7 +199,7 @@ FROM stream(live.silver_product)
 -- COMMAND ----------
 
 -- create the gold table
-CREATE INCREMENTAL LIVE TABLE dim_store
+CREATE STREAMING LIVE TABLE dim_store
 TBLPROPERTIES ("quality" = "gold")
 COMMENT "Slowly Changing Dimension Type 2 for store dimension in the gold layer";
 
