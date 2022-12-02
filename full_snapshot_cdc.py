@@ -20,12 +20,16 @@ display(source_df)
 
 # COMMAND ----------
 
-# define a function that can compute CDC operations from full snapshot
-# this function relies on a single primary key and is not tolerant to a changing source schema
-# the mechanism to compute differences is to perform a full outer join on the primary key
-# between the previous snapshot and the new incoming snapshot
-# there may be a more intelligent way to do this by computing the latest snapshot from the target table
-# rather than keeping a copy of the previous snapshot
+# Define a function that can compute CDC operations from full snapshot.
+# This function relies on a single primary key and is not tolerant to a changing source schema.
+# The mechanism to compute differences is to perform a full outer join on the primary key
+#   between the previous snapshot and the new incoming snapshot.
+# There may be a more intelligent way to do this by computing the latest snapshot from the target table
+#   rather than keeping a copy of the previous snapshot
+
+# WARNING I have not thoroughly tested this code; please don't put into production without rigorous testing
+# Additonally, because this solution requires mantaining two tables, if the _fullsnapshot table fails to write
+#   after the target table has been updated, then the next run may produce incorrect results
 
 from delta.tables import DeltaTable
 import pyspark.sql.functions as F
@@ -74,7 +78,7 @@ def generate_full_snapshot_cdc(snapshot: DataFrame, primary_key: str, target_tab
       .withColumnRenamed("_pk", primary_key)
       .withColumnRenamed("_newop", "_op")
       .withColumn("_seq", F.lit(latest_version + 1))
-      .where(F.col("_op").isNotNull())
+      .where(F.col("_op").isNotNull()) # drop all rows where we didn't have to do anything
     )
     changes.write.format("delta").mode("append").saveAsTable(target_table_name)
     snapshot.write.mode("overwrite").saveAsTable(fullsnapshot_table_name)
