@@ -49,10 +49,6 @@ DOWNLOAD_LOCATION = f'{ROOT_PATH}/downloads'
 
 # COMMAND ----------
 
-os.getcwd()
-
-# COMMAND ----------
-
 import os
 dbutils.fs.cp(f'file:{os.getcwd()}/../data/dlt_example.parquet', f'{DOWNLOAD_LOCATION}/dlt_example.parquet')
 dbutils.fs.cp(f'file:{os.getcwd()}/../data/dlt_example_cdc.parquet', f'{DOWNLOAD_LOCATION}/dlt_example_cdc.parquet')
